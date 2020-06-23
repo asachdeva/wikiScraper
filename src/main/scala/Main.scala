@@ -1,8 +1,10 @@
 import fs2._
 
 import _root_.io.circe._
+
 import java.net.URL
 import java.io.File
+
 import cats.effect._
 import cats.implicits._
 
