@@ -1,0 +1,9 @@
+# Metals + Bloop
+.metals
+.bloop
+project/metals.sbt
+
+# Target
+target/
+
+artistPages.txt
