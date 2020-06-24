@@ -50,7 +50,6 @@ lazy val `wikiScraper` = project
       Libraries.http4sBlazeServer,
       Libraries.http4sCore,
       Libraries.http4sDsl,
-      Libraries.logback,
       Libraries.scalaScraper
     ),
     addCompilerPlugin(Libraries.betterMonadicFor),
