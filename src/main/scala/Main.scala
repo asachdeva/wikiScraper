@@ -83,7 +83,7 @@ object Main extends IOApp {
           //.through(accumulateResults)
           //.through(uploadSummaries)
           .compile
-          .drain
+          .drain >> IO(println("Done!"))
       }
       .as(ExitCode.Success)
 }
