@@ -1,8 +1,10 @@
 import fs2._
 
-//import _root_.io.circe.syntax._
+import _root_.io.circe.syntax._
+import _root_.io.circe._
+import _root_.io.circe.parser._
+//import _root_.io.circe.optics.JsonPath._
 
-import java.io.File
 import java.net.URL
 import cats.effect._
 import cats.implicits._
@@ -16,10 +18,14 @@ import net.ruippeixotog.scalascraper.dsl.DSL._
 import net.ruippeixotog.scalascraper.dsl.DSL.Extract.{attr, elementList}
 import net.ruippeixotog.scalascraper.scraper.HtmlExtractor
 import net.ruippeixotog.scalascraper.model.Element
-
 import scala.concurrent.ExecutionContext.Implicits.global
+import java.io.File
 
 object Main extends IOApp {
+
+  val labelCounts = "labels.json"
+  val summaryCounts = "summary.json"
+
   val browser: JsoupBrowser = JsoupBrowser.typed()
   val sourceUrl = new URL(
     "https://en.wikipedia.org/w/api.php?action=parse&page=List_of_American_Idol_finalists&format=json&prop=text"
@@ -36,34 +42,42 @@ object Main extends IOApp {
       .map(link => link.replaceAll("""(/wiki/)|(\\\")|(\\\\)""", ""))
   }
 
-  def summarizeArtistInfo(uris: List[Uri]) = {
-    val artistSummaryHtmlList = scala.collection.mutable.ListBuffer[String]()
+  def summarizeArtistInfo(uris: List[String]) = {
+    val mutableMap = new scala.collection.mutable.HashMap[String, List[String]]
     val client: Resource[IO, Client[IO]] = BlazeClientBuilder[IO](global).resource
     uris.foreach { uri =>
+      mutableMap.addOne((uri, List.empty))
+      val uriString =
+        s"https://en.wikipedia.org/w/api.php?action=query&prop=revisions&rvprop=content&format=json&titles=$uri&rvsection=0&rvslots=main"
+      val URL = Uri.unsafeFromString(uriString)
       val data = client
-        .use(_.expect[String](uri))
+        .use(_.expect[String](URL))
         .unsafeRunSync()
-      val doc = browser.parseString(data)
-      artistSummaryHtmlList += doc.toHtml
+
+      val json: Json = parse(data.stripMargin.asJson.noSpaces).getOrElse(Json.Null)
+      val cleansed = json.asString.get.replaceAll("""(\\\")|(\\\\)""", "")
+
+      val cleansedJson = parse(cleansed.asJson.noSpaces).getOrElse(Json.Null)
+
+      // TODO Parse String/json and aggregate map of Artist to record labels
+      // TODO Build up files to upload and write to output
+      println(cleansedJson)
+      val files = List.empty
+      Stream.eval(IO(files))
     }
-    (artistSummaryHtmlList.toList)
   }
 
-  def parseArtistPagesIntoUrls[A]: Pipe[IO, List[String], List[Uri]] =
+  def parseArtistPagesIntoUrls[A]: Pipe[IO, List[String], List[String]] =
     _.evalMap { pages =>
-      val urls = scala.collection.mutable.ListBuffer[Uri]()
+      val urls = scala.collection.mutable.ListBuffer[String]()
       pages
         .foreach { page =>
-          val uriString =
-            s"https://en.wikipedia.org/w/api.php?action=query&prop=revisions&rvprop=content&format=json&titles=$page&rvsection=0&rvslots=main"
-          urls += Uri.unsafeFromString(uriString)
+          urls += page
         }
       IO(urls.toList)
     }
 
-  def accumulateResults: Pipe[IO, List[String], List[File]] = ???
-
-  def uploadSummaries: Pipe[IO, List[File], Unit] = ???
+  def uploadFiles[A]: Pipe[IO, List[File], Unit] = ???
 
   override def run(args: List[String]): IO[ExitCode] =
     Blocker[IO]
@@ -80,10 +94,9 @@ object Main extends IOApp {
           .map(line => rawLineToArtistLink(line))
           .through(parseArtistPagesIntoUrls)
           .map(uris => summarizeArtistInfo(uris))
-          //.through(accumulateResults)
-          //.through(uploadSummaries)
+          //.through(uploadSummaryFiles)
           .compile
-          .drain >> IO(println("Done!"))
+          .drain >> (IO(println("Done!")))
       }
       .as(ExitCode.Success)
 }

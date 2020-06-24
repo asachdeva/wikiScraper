@@ -31,11 +31,12 @@ lazy val noPublish = Seq(
   skip in publish := true
 )
 
-lazy val `wikiScraper` = project
+lazy val `hifi_challenge` = project
   .in(file("."))
   .settings(
     testSettings,
     organization := "asachdeva",
+    name := "wikiScraper",
     version := "0.0.1-SNAPSHOT",
     scalaVersion := "2.13.2",
     libraryDependencies ++= Seq(
@@ -43,6 +44,7 @@ lazy val `wikiScraper` = project
       Libraries.circeFs2,
       Libraries.circeGeneric,
       Libraries.circeLiteral,
+      Libraries.circeOptics,
       Libraries.circeParser,
       Libraries.fs2Core,
       Libraries.fs2IO,

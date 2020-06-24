@@ -34,6 +34,7 @@ object Dependencies {
     lazy val circeFs2 = circe("circe-fs2", Versions.circe)
     lazy val circeGeneric = circe("circe-generic", Versions.circe)
     lazy val circeLiteral = circe("circe-literal", Versions.circe)
+    lazy val circeOptics = circe("circe-optics", Versions.circe)
     lazy val circeParser = circe("circe-parser", Versions.circe)
 
     lazy val http4sBlazeClient = http4s("http4s-blaze-client", Versions.http4s)
