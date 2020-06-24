@@ -6,6 +6,7 @@ object Dependencies {
     val circe = "0.13.0"
     val fs2 = "2.4.2"
     val http4s = "0.21.4"
+    val scalaParserCombinator = "1.1.2"
     val scalaScraper = "2.2.0"
 
     // Test
@@ -41,6 +42,9 @@ object Dependencies {
     lazy val http4sBlazeServer = http4s("http4s-blaze-server", Versions.http4s)
     lazy val http4sCore = http4s("http4s-blaze-client", Versions.http4s)
     lazy val http4sDsl = http4s("http4s-dsl", Versions.http4s)
+
+    lazy val scalaParserCombinator =
+      "org.scala-lang.modules" %% "scala-parser-combinators" % Versions.scalaParserCombinator
 
     lazy val scalaScraper = "net.ruippeixotog" %% "scala-scraper" % Versions.scalaScraper
 

@@ -2,10 +2,18 @@ import com.scalapenos.sbt.prompt.SbtPrompt.autoImport._
 import com.scalapenos.sbt.prompt._
 import Dependencies._
 
-name := """wikiScraper"""
-organization in ThisBuild := "asachdeva"
+Global / onChangedBuildSource := ReloadOnSourceChanges
 
-val format = taskKey[Unit]("Format files using scalafmt and scalafix")
+ThisBuild / scalaVersion := "2.13.2"
+ThisBuild / startYear := Some(2020)
+ThisBuild / version := "0.1.0"
+ThisBuild / organization := "asachdeva"
+ThisBuild / organizationName := "Akshay Sachdeva"
+ThisBuild / Compile / run / fork := true
+
+name := """wikiScraper"""
+
+val format = taskKey[Unit]("Format files using scalafmt")
 
 promptTheme := PromptTheme(
   List(
@@ -31,7 +39,7 @@ lazy val noPublish = Seq(
   skip in publish := true
 )
 
-lazy val `hifi_challenge` = project
+lazy val `wikiScraper` = project
   .in(file("."))
   .settings(
     testSettings,
@@ -52,6 +60,7 @@ lazy val `hifi_challenge` = project
       Libraries.http4sBlazeServer,
       Libraries.http4sCore,
       Libraries.http4sDsl,
+      Libraries.scalaParserCombinator,
       Libraries.scalaScraper
     ),
     addCompilerPlugin(Libraries.betterMonadicFor),

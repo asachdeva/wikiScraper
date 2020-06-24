@@ -1,11 +1,12 @@
 import fs2._
 
-import _root_.io.circe.syntax._
+import _root_.io.circe.parser.{parse => circeParse}
 import _root_.io.circe._
-import _root_.io.circe.parser._
-//import _root_.io.circe.optics.JsonPath._
+import _root_.io.circe.optics.JsonPath._
 
 import java.net.URL
+import java.io.File
+
 import cats.effect._
 import cats.implicits._
 
@@ -18,10 +19,10 @@ import net.ruippeixotog.scalascraper.dsl.DSL._
 import net.ruippeixotog.scalascraper.dsl.DSL.Extract.{attr, elementList}
 import net.ruippeixotog.scalascraper.scraper.HtmlExtractor
 import net.ruippeixotog.scalascraper.model.Element
-import scala.concurrent.ExecutionContext.Implicits.global
-import java.io.File
 
-object Main extends IOApp {
+import scala.concurrent.ExecutionContext.Implicits.global
+
+object Main extends IOApp with LexicalParser {
 
   val labelCounts = "labels.json"
   val summaryCounts = "summary.json"
@@ -48,20 +49,17 @@ object Main extends IOApp {
     uris.foreach { uri =>
       mutableMap.addOne((uri, List.empty))
       val uriString =
-        s"https://en.wikipedia.org/w/api.php?action=query&prop=revisions&rvprop=content&format=json&titles=$uri&rvsection=0&rvslots=main"
+        s"https://en.wikipedia.org/w/api.php?action=parse&format=json&page=$uri&prop=wikitext&section=0"
       val URL = Uri.unsafeFromString(uriString)
       val data = client
         .use(_.expect[String](URL))
         .unsafeRunSync()
 
-      val json: Json = parse(data.stripMargin.asJson.noSpaces).getOrElse(Json.Null)
-      val cleansed = json.asString.get.replaceAll("""(\\\")|(\\\\)""", "")
-
-      val cleansedJson = parse(cleansed.asJson.noSpaces).getOrElse(Json.Null)
-
+      val _wikitext = root.parse.wikitext.*.string
+      val wikitext = _wikitext.getOption(circeParse(data).getOrElse(Json.Null)).getOrElse("")
+      println(wikitext.toString.stripMargin)
       // TODO Parse String/json and aggregate map of Artist to record labels
       // TODO Build up files to upload and write to output
-      println(cleansedJson)
       val files = List.empty
       Stream.eval(IO(files))
     }
