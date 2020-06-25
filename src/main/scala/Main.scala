@@ -1,9 +1,5 @@
 import fs2._
 
-import _root_.io.circe.parser.{parse => circeParse}
-import _root_.io.circe._
-import _root_.io.circe.optics.JsonPath._
-
 import java.net.URL
 import java.io.File
 
@@ -55,9 +51,9 @@ object Main extends IOApp with LexicalParser {
         .use(_.expect[String](URL))
         .unsafeRunSync()
 
-      val _wikitext = root.parse.wikitext.*.string
-      val wikitext = _wikitext.getOption(circeParse(data).getOrElse(Json.Null)).getOrElse("")
-      println(wikitext.toString.stripMargin)
+      // println(data)
+      val labelData = parseArtistWikiText(data)
+      println(labelData)
       // TODO Parse String/json and aggregate map of Artist to record labels
       // TODO Build up files to upload and write to output
       val files = List.empty

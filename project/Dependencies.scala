@@ -4,12 +4,13 @@ object Dependencies {
 
   object Versions {
     val circe = "0.13.0"
+    val fastParse = "2.2.2"
     val fs2 = "2.4.2"
     val http4s = "0.21.4"
-    val scalaParserCombinator = "1.1.2"
     val scalaScraper = "2.2.0"
 
     // Test
+    val munitVersion = "0.7.9"
 
     // Compiler
     val kindProjector = "0.11.0"
@@ -28,6 +29,8 @@ object Dependencies {
     lazy val kindProjector = ("org.typelevel" %% "kind-projector" % Versions.kindProjector).cross(CrossVersion.full)
     lazy val betterMonadicFor = "com.olegpy" %% "better-monadic-for" % Versions.betterMonadicFor
 
+    lazy val fastParse = "com.lihaoyi" %% "fastparse" % Versions.fastParse
+
     lazy val fs2Core = fs2("fs2-core", Versions.fs2)
     lazy val fs2IO = fs2("fs2-io", Versions.fs2)
 
@@ -43,15 +46,13 @@ object Dependencies {
     lazy val http4sCore = http4s("http4s-blaze-client", Versions.http4s)
     lazy val http4sDsl = http4s("http4s-dsl", Versions.http4s)
 
-    lazy val scalaParserCombinator =
-      "org.scala-lang.modules" %% "scala-parser-combinators" % Versions.scalaParserCombinator
-
     lazy val scalaScraper = "net.ruippeixotog" %% "scala-scraper" % Versions.scalaScraper
 
     // Runtime
     lazy val logback = "ch.qos.logback" % "logback-classic" % Versions.logback
 
     // Test
+    lazy val munit = "org.scalameta" %% "munit" % Versions.munitVersion
   }
 
 }
